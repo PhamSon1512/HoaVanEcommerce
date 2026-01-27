@@ -1,0 +1,6 @@
+@HoaVanEcommerce.BE_HostAddress = http://localhost:5211
+
+GET {{HoaVanEcommerce.BE_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
