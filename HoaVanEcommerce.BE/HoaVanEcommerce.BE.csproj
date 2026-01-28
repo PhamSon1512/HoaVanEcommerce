@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\HoaVanEcommerce.Application\HoaVanEcommerce.Application.csproj" />
+    <ProjectReference Include="..\HoaVanEcommerce.Infrastructure\HoaVanEcommerce.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>

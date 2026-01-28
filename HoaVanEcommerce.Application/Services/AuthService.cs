@@ -4,8 +4,9 @@ using System.Text;
 using HoaVanEcommerce.BE.Application.DTOs.Auth;
 using HoaVanEcommerce.BE.Application.Interfaces;
 using HoaVanEcommerce.Domain.Entities;
+using HoaVanEcommerce.BE.Application.Settings;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 namespace HoaVanEcommerce.BE.Application.Services;
@@ -15,18 +16,18 @@ public class AuthService : IAuthService
     private readonly IUserRepository _userRepository;
     private readonly IRoleRepository _roleRepository;
     private readonly IPasswordHasher<User> _passwordHasher;
-    private readonly IConfiguration _configuration;
+    private readonly JwtSettings _jwtSettings;
 
     public AuthService(
         IUserRepository userRepository,
         IRoleRepository roleRepository,
         IPasswordHasher<User> passwordHasher,
-        IConfiguration configuration)
+        IOptions<JwtSettings> jwtOptions)
     {
         _userRepository = userRepository;
         _roleRepository = roleRepository;
         _passwordHasher = passwordHasher;
-        _configuration = configuration;
+        _jwtSettings = jwtOptions.Value;
     }
 
     public async Task<AuthResponseDto> RegisterAsync(RegisterRequestDto request)
@@ -105,11 +106,7 @@ public class AuthService : IAuthService
 
     private string GenerateJwtToken(User user)
     {
-        var jwtSection = _configuration.GetSection("Jwt");
-        var key = jwtSection.GetValue<string>("Key") ?? "Temporary_Dev_Key_Change_Me";
-        var issuer = jwtSection.GetValue<string>("Issuer") ?? "HoaVanEcommerce";
-        var audience = jwtSection.GetValue<string>("Audience") ?? "HoaVanEcommerceClient";
-        var expiresMinutes = jwtSection.GetValue<int?>("ExpiresMinutes") ?? 60;
+        var keyBytes = Encoding.UTF8.GetBytes(_jwtSettings.Key);
 
         var claims = new List<Claim>
         {
@@ -118,14 +115,14 @@ public class AuthService : IAuthService
             new("fullName", user.FullName ?? string.Empty)
         };
 
-        var keyBytes = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
-        var creds = new SigningCredentials(keyBytes, SecurityAlgorithms.HmacSha256);
+        var securityKey = new SymmetricSecurityKey(keyBytes);
+        var creds = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
 
         var token = new JwtSecurityToken(
-            issuer,
-            audience,
+            _jwtSettings.Issuer,
+            _jwtSettings.Audience,
             claims,
-            expires: DateTime.UtcNow.AddMinutes(expiresMinutes),
+            expires: DateTime.UtcNow.AddMinutes(_jwtSettings.AccessTokenExpirationMinutes),
             signingCredentials: creds);
 
         return new JwtSecurityTokenHandler().WriteToken(token);
