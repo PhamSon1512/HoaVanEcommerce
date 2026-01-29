@@ -7,30 +7,28 @@ namespace HoaVanEcommerce.BE.Controllers;
 [Route("api/[controller]")]
 public class ProductsController : ControllerBase
 {
-    //private readonly IProductService _productService;
+    private readonly IProductService _productService;
 
-    //public ProductsController(IProductService productService)
-    //{
-    //    _productService = productService;
-    //}
+    public ProductsController(IProductService productService)
+    {
+        _productService = productService;
+    }
 
-    //[HttpGet]
-    //public async Task<IActionResult> GetList([FromQuery] int? categoryId, [FromQuery] string? search)
-    //{
-    //    var products = await _productService.GetListAsync(categoryId, search);
-    //    return Ok(products);
-    //}
+    // Public list, supports filtering/search
+    [HttpGet]
+    public async Task<IActionResult> GetList([FromQuery] int? categoryId, [FromQuery] string? search, CancellationToken cancellationToken)
+    {
+        var products = await _productService.GetListAsync(categoryId, search, cancellationToken);
+        return Ok(products);
+    }
 
-    //[HttpGet("{id:int}")]
-    //public async Task<IActionResult> GetById(int id)
-    //{
-    //    var product = await _productService.GetByIdAsync(id);
-    //    if (product == null)
-    //    {
-    //        return NotFound();
-    //    }
-
-    //    return Ok(product);
-    //}
+    // Public detail
+    [HttpGet("{id:int}")]
+    public async Task<IActionResult> GetById(int id, CancellationToken cancellationToken)
+    {
+        var product = await _productService.GetByIdAsync(id, cancellationToken);
+        if (product == null) return NotFound();
+        return Ok(product);
+    }
 }
 

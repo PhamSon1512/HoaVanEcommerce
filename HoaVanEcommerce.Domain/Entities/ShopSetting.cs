@@ -1,11 +1,16 @@
+using System;
+
 namespace HoaVanEcommerce.Domain.Entities;
 
 public class ShopSetting
 {
     public int Id { get; set; }
-    public string Key { get; set; } = null!;
-    public string? Value { get; set; }
+    public string BankName { get; set; } = null!;
+    public string AccountName { get; set; } = null!;
+    public string AccountNumber { get; set; } = null!;
+    public string QrImageUrl { get; set; } = null!;
     public string? Description { get; set; }
-    public bool IsActive { get; set; } = true;
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 }
 

@@ -7,11 +7,11 @@ public class Complaint
     public int Id { get; set; }
     public int OrderId { get; set; }
     public int UserId { get; set; }
-    public string Title { get; set; } = null!;
-    public string Content { get; set; } = null!;
-    public string Status { get; set; } = null!; // Pending, InReview, Resolved, Rejected
+    public string Type { get; set; } = null!;
+    public string? Description { get; set; }
+    public string Status { get; set; } = "OPEN";
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-    public DateTime? ResolvedAt { get; set; }
+    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
     public Order Order { get; set; } = null!;
     public User User { get; set; } = null!;

@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="CloudinaryDotNet" Version="1.27.3" />
     <ProjectReference Include="..\HoaVanEcommerce.Application\HoaVanEcommerce.Application.csproj" />
     <ProjectReference Include="..\HoaVanEcommerce.Domain\HoaVanEcommerce.Domain.csproj" />
 	<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0">
