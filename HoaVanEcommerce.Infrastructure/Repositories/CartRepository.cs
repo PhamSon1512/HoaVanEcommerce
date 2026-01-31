@@ -45,6 +45,16 @@ public sealed class CartRepository : ICartRepository
             .FirstOrDefaultAsync(i => i.Id == cartItemId, cancellationToken);
     }
 
+    public Task<List<CartItem>> GetCartItemsByIdsAsync(List<int> cartItemIds, CancellationToken cancellationToken = default)
+    {
+        return _dbContext.CartItems
+            .Include(i => i.Product)
+                .ThenInclude(p => p.Category)
+            .Include(i => i.Cart)
+            .Where(i => cartItemIds.Contains(i.Id))
+            .ToListAsync(cancellationToken);
+    }
+
     public Task<CartItem?> GetCartItemByCartAndProductAsync(int cartId, int productId, CancellationToken cancellationToken = default)
     {
         return _dbContext.CartItems
