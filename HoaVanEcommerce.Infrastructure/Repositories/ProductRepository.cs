@@ -64,10 +64,33 @@ public sealed class ProductRepository : IProductRepository
         return _dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public Task DeleteAsync(Product product, CancellationToken cancellationToken = default)
+    public async Task DeleteAsync(Product product, CancellationToken cancellationToken = default)
     {
+        // Xóa tất cả cart_items liên quan đến sản phẩm này trước
+        var cartItems = await _dbContext.CartItems
+            .Where(ci => ci.ProductId == product.Id)
+            .ToListAsync(cancellationToken);
+        
+        if (cartItems.Any())
+        {
+            _dbContext.CartItems.RemoveRange(cartItems);
+        }
+
+        // Xóa tất cả order_items liên quan đến sản phẩm này
+        // Lưu ý: Điều này sẽ xóa lịch sử đơn hàng liên quan đến sản phẩm
+        // Nếu muốn giữ lịch sử, cần migration để cho phép ProductId nullable trong order_items
+        var orderItems = await _dbContext.OrderItems
+            .Where(oi => oi.ProductId == product.Id)
+            .ToListAsync(cancellationToken);
+        
+        if (orderItems.Any())
+        {
+            _dbContext.OrderItems.RemoveRange(orderItems);
+        }
+
+        // Xóa sản phẩm
         _dbContext.Products.Remove(product);
-        return _dbContext.SaveChangesAsync(cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
     public Task<bool> ExistsAsync(int id, CancellationToken cancellationToken = default)

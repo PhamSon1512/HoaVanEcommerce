@@ -132,6 +132,9 @@ public sealed class ProductService : IProductService
         var product = await _productRepository.GetByIdAsync(id, cancellationToken);
         if (product is null) return false;
 
+        // Xóa hoàn toàn sản phẩm khỏi database
+        // Repository sẽ tự động xóa các cart_items liên quan trước khi xóa product
+        // Lưu ý: order_items sẽ vẫn giữ nguyên để bảo toàn lịch sử đơn hàng
         await _productRepository.DeleteAsync(product, cancellationToken);
         return true;
     }
